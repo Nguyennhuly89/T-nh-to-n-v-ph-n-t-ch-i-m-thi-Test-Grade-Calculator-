@@ -15,6 +15,13 @@ IV. Nội dung hướng dẫn
 
 Dự án cần viết một chương trình để tính toán điểm thi cho nhiều lớp với sĩ số hàng nghìn học sinh. Mục đích của chương trình giúp giảm thời gian chấm điểm. Dự án sẽ áp dụng các functions khác nhau trong Python để viết chương trình.
 ## II. Một vài lưu ý
+Trước khi tiếp tục, hãy đảm bảo bạn có thể đáp ứng các yêu cầu sau:
+
+* Bạn đã cài đặt version mới nhất của Python
+
+* Bạn đã install pandas, numpy
+
+## III. Hướng dẫn cài đặt
 #### Hướng dẫn cài đặt thư viện pandas, numpy
 
 Install pandas
@@ -26,13 +33,7 @@ Install numpy
 ```bash
   pip install numpy
 ```
-Trước khi tiếp tục, hãy đảm bảo bạn có thể đáp ứng các yêu cầu sau:
 
-* Bạn đã cài đặt version mới nhất của Python
-
-* Bạn đã install pandas, numpy
-
-## III. Hướng dẫn cài đặt
 ## IV. Nội dung hướng dẫn
 
 Chương trình sẽ thực hiện với các tác vụ sau:
