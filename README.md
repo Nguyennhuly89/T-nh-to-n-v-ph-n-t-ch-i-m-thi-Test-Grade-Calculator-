@@ -456,7 +456,7 @@ def sum_score(file):
     else:
         print('Errors')
 ```
-Sau đó xây dựng hàm để lưu kết quả và tệp dữ liệu.
+Sau đó xây dựng hàm để lưu kết quả vào tệp dữ liệu.
 ```bash
 def result(file):
     path = 'E:\Lap DSP301\ASM\data-files\Result' # Đường dẫn lưu dữ liệu file kết quả
@@ -522,7 +522,7 @@ Questions that most people answer incorrectly:
 - Student quantity has incorrect answer: 5 
 - Rate: 0.238
 ```
-File kết quả của tệp 2
+File kết quả của tệp dữ liệu thứ 2
 ```bash
 N00000021,68
 N00000022,76
@@ -547,3 +547,179 @@ N00000044,90
 N00000045,67
 ```
 Như vậy mình đã hướng dẫn các bạn hoàn thành dự án bằng cách sử dụng các hàm functions trong Python.
+### Task 5: Chỉ sử dụng pandas và numpy khi triển khai task 1 đến task 4
+Dưới đây mình sẽ tiếp tục hướng dẫn các bạn sử dụng pandas và numpy để triển khai các nội dung yêu cầu ở task 1 đến task 4
+
+Import pandas và numpy để thực hiện dự án. Ta sử dụng pandas.read_csv để đọc tệp dữ liệu
+Đọc file với sep = '\t' để tránh lỗi không lấy hết dữ liệu của file (với những dòng có nhiều cột hơn chuẩn). Với Task 1 dùng pandas ta viết code như dưới:
+```bash
+import numpy as np
+import pandas as pd
+if file in filename:
+    df = pd.read_csv(path + '\\' + file + '.txt', sep='\t', header=None, on_bad_lines='skip')
+    print('Sucessfully opened ' + file + '.txt')
+else:
+    print('Files can not be found. Please check filename again')
+```
+Task 2, ta thống kê các báo cáo bằng pandas và numpy. Import file và tách các dữ liệu theo cột
+```bash
+df = pd.read_csv(path + '\\' + file + '.txt', sep='\t',header=None, on_bad_lines='skip')
+df = df[0].str.split(',',expand = True)
+```
+Tiến hành check dữ liệu hợp lệ hay không bằng các tạo thêm cột check số ký tự ID
+```bash
+df['Check ID Character'] = df[0].apply(lambda x: len(x))
+```
+Tạo hàm kiểm tra xem các ký tự có phải là số hay không
+```bash
+def check_ID(x):
+    try:
+        int(x)
+        return 'OK'
+    except:
+        return 'NG'
+```
+Tạo thêm cột check ID có hợp lệ hay không (ID hợp lệ phải chứa ký tự N đầu tiên và theo sau là 8 ký tự số)
+```bash
+df['Check regular ID '] = df[0].apply(lambda x:x[1:])
+df['Check regular ID '] = df['Check regular ID '].apply(lambda x: check_ID(x))
+```
+Như vậy tính thêm 2 cột vừa tạo, 1 dòng hợp lệ sẽ có 28 giá trị, khác 28 thì sẽ không hợp lệ.
+
+Ta tạo dataframe tập hợp dữ liệu không hợp lệ do có nhiều hơn hoặc ít hơn 28 giá trị
+```bash
+invalid_value1 = df[df.count(axis=1)>28]
+invalid_value2 = df[df.count(axis=1)<28]
+invalid_value = pd.concat([invalid_value1, invalid_value2],axis=0)
+```
+Tạo dataframe tập hợp dữ liệu không hợp lệ do ID không hợp lệnh
+```bash
+invalid_id1 = df[(df['Check ID Character']!=9) | ~(df[0].str.startswith('N'))]
+invalid_id2 = df[df['Check regular ID ']=='NG']
+invalid_id = pd.concat([invalid_id1, invalid_id2],axis = 0)
+```
+Tiến hành in các thống kê theo yêu cầu dự án.
+```bash
+print('\n**** ANALYZING ****\n')
+if invalid_id.shape[0] == 0 and invalid_value.shape[0] == 0:
+    print('No errors found!')
+else:
+    for i in range(invalid_value.shape[0]):
+        arr = np.array(invalid_value.iloc[i,:invalid_value.shape[1]-2])
+        b = np.sum(arr == None)
+        arr = np.array(invalid_value.iloc[i, :invalid_value.shape[1] - 2 - b])
+        print('Invalid line of data: does not contain exactly 26 values: \n',arr.tolist())
+    for a in range(invalid_id.shape[0]):
+        arr_id = np.array(invalid_id.iloc[a,: invalid_id.shape[1]-2])
+        c = np.sum(arr_id == None)
+        arr_id = np.array(invalid_id.iloc[a, : invalid_id.shape[1] - 2 - c])
+        print('Invalid line of data: N# is invalid \n',arr_id.tolist())
+print('\n**** REPORT ****\n')
+print('Total valid lines of data:', df.shape[0] - invalid_id.shape[0] - invalid_value.shape[0])
+print('Total invalid lines of data:', invalid_value.shape[0] + invalid_id.shape[0])
+```
+Ta đã hoàn thành task 2, tiếp tục đến với task 3.
+Để thống kê điểm cho từng lớp, trước tiên ta tạo dataframe lưu trữ các dữ liệu hợp lệ của tệp dữ liệu.
+```bash
+valid_line = df[(df['Check regular ID ']=='OK') & (df['Check ID Character']==9)
+                    & (df.count(axis=1)==28) & df[0].str.startswith('N')]
+```
+Tạo từ điển lưu trữ điểm cho các câu hỏi của mỗi học sinh:
+```bash
+ID_list = list(valid_line[0])
+score_list = []
+for i in range(valid_line.shape[0]):
+    arr = np.array(valid_line.iloc[i,:26])
+    i = 0
+    scores = []
+    for a in arr[1:]:
+        if a == answer_key[i]:
+            scores.append(4)
+            i += 1
+        elif a == '':
+            scores.append(0)
+            i += 1
+        else:
+            scores.append(-1)
+            i += 1
+    score_list.append(scores)
+scores_dict = dict(zip(ID_list,score_list))
+```
+Tạo dataframe từ dict lưu trữ điểm vừa Tạo
+```bash
+score_df = pd.DataFrame.from_dict(scores_dict, orient='index')
+```
+Tạo thêm cột tính tổng điểm của mỗi học sinh
+```bash
+score_df['Total scores'] = (score_df.sum(axis=1))
+```
+Lấy số lượng các học sinh đạt điểm cao (Total scores >80)
+```bash
+high_score = score_df[score_df['Total scores']>80]
+print('\nTotal student of high score:', high_score.shape[0])
+```
+Tính điểm trung bình của lớp
+```bash
+mean_score = score_df['Total scores'].mean()
+print('Mean score:', round(mean_score,3))
+```
+Tính điểm thấp nhất
+```bash
+lowest_score = score_df['Total scores'].min()
+print('Lowest score:', lowest_score)
+```
+Tính điểm cao nhất
+```bash
+highest_score = score_df['Total scores'].max()
+print('Highest score:',highest_score)
+```
+Tính miền giá trị của điểm
+```bash
+print('Range of score:', highest_score - lowest_score)
+```
+Tính giá trị trung vị của điểm
+```bash
+median_score = score_df['Total scores'].median()
+print('Median score:', round(median_score,3))
+```
+Tạo dataframe lưu trữ số lượng các câu hỏi bị bỏ qua
+```bash
+skip_questions = list((score_df == 0).sum())
+skip_dict = dict(zip(range(1,26),skip_questions))
+skip_df = pd.DataFrame.from_dict(skip_dict, orient='index')
+```
+In thông tin các câu hỏi bị bỏ qua nhiều nhất
+```bash
+print('Questions that most people skip:')
+for i in range(skip_df.shape[0]):
+    if skip_df.iloc[i,0] == skip_df[0].max():
+        print('\n- Question:', i + 1,
+                '\n- Student quantity skip question:', skip_df.iloc[i,0],
+                '\n- Rate:', round(skip_df.iloc[i,0]/valid_line.shape[0],3))
+    else:
+        continue
+```
+Tạo dataframe lưu trữ số lượng các câu hỏi trả lời sai
+```bash
+incorrect_ans = list((score_df == -1).sum())
+incorrect_dict = dict(zip(range(1,26), incorrect_ans))
+incorrect_df = pd.DataFrame.from_dict(incorrect_dict,orient='index')
+```
+In thông tin các câu hỏi bị trả lời sai nhiều nhất
+```bash
+print('Questions that most people answer incorrectly:')
+for i in range(incorrect_df.shape[0]):
+    if incorrect_df.iloc[i,0] == incorrect_df[0].max():
+        print('\n- Question:', i + 1,
+                '\n- Student quantity has incorrect answer:', incorrect_df.iloc[i,0],
+                '\n- Rate:', round(incorrect_df.iloc[i,0]/valid_line.shape[0],3))
+    else:
+        continue
+```
+Với task 4, lưu trữ kết quả vào tệp với code bên dưới:
+```bash
+path = 'E:\Lap DSP301\ASM\data-files\Result'
+result_df = score_df.iloc[:,-1]
+result_df.to_csv(path + '\\' + file + '_grades.txt', sep = ',',header = False)
+```
+Như vậy mình đã hoàn thành hướng dẫn các bạn sử dụng pandas và numpy để thực hiện dự án. Hi vọng sẽ nhận được nhiều đóng góp của các bạn để có thể học hỏi được nhiều hơn. Thank you so much.
