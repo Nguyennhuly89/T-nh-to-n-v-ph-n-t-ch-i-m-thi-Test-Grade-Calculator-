@@ -550,7 +550,7 @@ Như vậy mình đã hướng dẫn các bạn hoàn thành dự án bằng cá
 ### Task 5: Chỉ sử dụng pandas và numpy khi triển khai task 1 đến task 4
 Dưới đây mình sẽ tiếp tục hướng dẫn các bạn sử dụng pandas và numpy để triển khai các nội dung yêu cầu ở task 1 đến task 4
 
-Import pandas và numpy để thực hiện dự án. Ta sử dụng pandas.read_csv để đọc tệp dữ liệu
+Import pandas và numpy để thực hiện dự án. Ta sử dụng pandas.read_csv để đọc tệp dữ liệu. 
 Đọc file với sep = '\t' để tránh lỗi không lấy hết dữ liệu của file (với những dòng có nhiều cột hơn chuẩn). Với Task 1 dùng pandas ta viết code như dưới:
 ```bash
 import numpy as np
@@ -592,7 +592,7 @@ invalid_value1 = df[df.count(axis=1)>28]
 invalid_value2 = df[df.count(axis=1)<28]
 invalid_value = pd.concat([invalid_value1, invalid_value2],axis=0)
 ```
-Tạo dataframe tập hợp dữ liệu không hợp lệ do ID không hợp lệnh
+Tạo dataframe tập hợp dữ liệu không hợp lệ do ID không hợp lệ
 ```bash
 invalid_id1 = df[(df['Check ID Character']!=9) | ~(df[0].str.startswith('N'))]
 invalid_id2 = df[df['Check regular ID ']=='NG']
