@@ -592,11 +592,27 @@ invalid_value1 = df[df.count(axis=1)>28]
 invalid_value2 = df[df.count(axis=1)<28]
 invalid_value = pd.concat([invalid_value1, invalid_value2],axis=0)
 ```
+Bên dưới là kết quả dataframe không hợp lệ của tệp dữ liệu thứ 2
+```bash
+            0  1  2  3  ...    26    27 Check ID Character Check regular ID 
+14  N00000035  B  A  D  ...     A     A                  9                OK
+2   N00000023     A  D  ...  None  None                  9                OK
+
+[2 rows x 30 columns]
+```
 Tạo dataframe tập hợp dữ liệu không hợp lệ do ID không hợp lệ
 ```bash
 invalid_id1 = df[(df['Check ID Character']!=9) | ~(df[0].str.startswith('N'))]
 invalid_id2 = df[df['Check regular ID ']=='NG']
 invalid_id = pd.concat([invalid_id1, invalid_id2],axis = 0)
+```
+Kết quả ID không hợp lệ của tệp dữ liệu thứ 2:
+```bash
+           0  1  2  3  4  ... 25    26    27 Check ID Character Check regular ID 
+4   N0000002  B  A  D  D  ...  D  None  None                  8                OK
+6  NA0000027  B  A  D  D  ...  D  None  None                  9                NG
+
+[2 rows x 30 columns]
 ```
 Tiến hành in các thống kê theo yêu cầu dự án.
 ```bash
@@ -623,6 +639,33 @@ Ta đã hoàn thành task 2, tiếp tục đến với task 3.
 ```bash
 valid_line = df[(df['Check regular ID ']=='OK') & (df['Check ID Character']==9)
                     & (df.count(axis=1)==28) & df[0].str.startswith('N')]
+```
+Dữ liệu được lưu như bên dưới (tệp dữ liệu thứ 2):
+```bash
+            0  1  2  3  4  ... 25    26    27 Check ID Character Check regular ID 
+0   N00000021  B  A  C  D  ...     None  None                  9                OK
+1   N00000022  B  A  D  A  ...  D  None  None                  9                OK
+3   N00000024  C  C  D  D  ...  D  None  None                  9                OK
+5   N00000026  B  C  D  D  ...  D  None  None                  9                OK
+7   N00000028  B  A  D  D  ...  D  None  None                  9                OK
+8   N00000029  B  A  D  D  ...  D  None  None                  9                OK
+9   N00000030  A  A  D  D  ...  D  None  None                  9                OK
+10  N00000031  B     D  D  ...  D  None  None                  9                OK
+11  N00000032  B  A  D  D  ...  D  None  None                  9                OK
+12  N00000033  B  A  D  D  ...  D  None  None                  9                OK
+13  N00000034  B     D     ...  D  None  None                  9                OK
+15  N00000036  B  A  D  D  ...     None  None                  9                OK
+16  N00000037  B  A  D  D  ...  D  None  None                  9                OK
+17  N00000038     A  D     ...  C  None  None                  9                OK
+18  N00000039  B  A  D  D  ...  D  None  None                  9                OK
+19  N00000040  B  A     D  ...  D  None  None                  9                OK
+20  N00000041     A  D  D  ...  D  None  None                  9                OK
+21  N00000042  B  A  D  D  ...  D  None  None                  9                OK
+22  N00000043  C  A  D  D  ...  D  None  None                  9                OK
+23  N00000044  B  A  D  D  ...  D  None  None                  9                OK
+24  N00000045  C  A  A  D  ...  D  None  None                  9                OK
+
+[21 rows x 30 columns]
 ```
 Tạo từ điển lưu trữ điểm cho các câu hỏi của mỗi học sinh:
 ```bash
@@ -652,6 +695,32 @@ score_df = pd.DataFrame.from_dict(scores_dict, orient='index')
 Tạo thêm cột tính tổng điểm của mỗi học sinh
 ```bash
 score_df['Total scores'] = (score_df.sum(axis=1))
+```
+```bash
+           0  1  2  3  4  5  6  7  ...  18  19  20  21  22  23  24  Total scores
+N00000021  4  4 -1  4  4 -1  4 -1  ...   4  -1   4   4   4   4   0            68
+N00000022  4  4  4 -1  4  4  4 -1  ...   4   4   4   4   4  -1   4            76
+N00000024 -1 -1  4  4  4  4  0  4  ...   4   4   4  -1   4   0   4            73
+N00000026  4 -1  4  4  4 -1 -1  4  ...   0   4   4   4   4   4   4            72
+N00000028  4  4  4  4 -1  4  4  4  ...  -1   4   4   4   4  -1   4            73
+N00000029  4  4  4  4  4 -1  4  4  ...   0   4   4   4   4   4   4            87
+N00000030 -1  4  4  4  4  4  4  0  ...   4   4   4   0   4   4   4            82
+N00000031  4  0  4  4  4  4  4  4  ...   4   4  -1   4   4   4   4            76
+N00000032  4  4  4  4  4  4  4  4  ...   4   4   0   4   4   4   4            87
+N00000033  4  4  4  4  4  0  4  4  ...   4   4   4   0   4   4   4            77
+N00000034  4  0  4  0  4  4 -1  4  ...  -1   4   4   0   4   4   4            69
+N00000036  4  4  4  4  4  4  4  4  ...   4   4   4   4   4   0   0            77
+N00000037  4  4  4  4  4  0  4  4  ...   4   4   0   0   0   4   4            75
+N00000038  0  4  4  0  4  4  4  4  ...   0   4   4  -1   4   4  -1            73
+N00000039  4  4  4  4  4 -1 -1  4  ...   4  -1   4   4   4  -1   4            66
+N00000040  4  4  0  4  4  4  4 -1  ...   4   4   4   0   4   4   4            73
+N00000041  0  4  4  4  4  4  4  4  ...   4   4  -1   4   4   4   4            91
+N00000042  4  4  4  4  4  4  4  4  ...   4   4   4   4   4   4   4           100
+N00000043 -1  4  4  4  4  4  4  4  ...   4   4   4   0   4   4   4            86
+N00000044  4  4  4  4  4  4  4  4  ...   4   4  -1   4   4   4   4            90
+N00000045 -1  4 -1  4  4  4  4 -1  ...   0   4   4   4   4   4   4            67
+
+[21 rows x 26 columns]
 ```
 Lấy số lượng các học sinh đạt điểm cao (Total scores >80)
 ```bash
